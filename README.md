@@ -55,28 +55,6 @@ npm start
 
 ---
 
-## ☁️ Production Deployment Guide
-
-### Deploy Backend (Render / Railway)
-1. Create a new **Web Service** pointing to the `/backend` directory.
-2. Build Command: `npm install`
-3. Start Command: `npm start`
-4. Environment Variables:
-   - `PORT`: `8081`
-   - `MONGODB_URI`: `<Your MongoDB Atlas Connection String>`
-   - `JWT_SECRET`: `<Your Production Secret>`
-   - `CORS_ORIGIN`: `https://your-frontend-domain.vercel.app`
-
-### Deploy Frontend (Vercel / Netlify)
-1. Import repository pointing to the `/frontend` directory.
-2. Build Command: `npm run build`
-3. Output Directory: `build`
-4. Environment Variables:
-   - `REACT_APP_API_URL`: `https://your-backend-service.onrender.com`
-   - `REACT_APP_SOCKET_URL`: `https://your-backend-service.onrender.com`
-
----
-
 ## 🔌 API & Socket Reference
 
 ### REST Endpoints
