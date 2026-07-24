@@ -1,0 +1,77 @@
+:root {
+  --bg-primary: #020617; /* bg-slate-950 */
+  --bg-card: #0F172A; /* bg-slate-900 */
+  --border-card: #1E293B; /* border-slate-800 */
+  --accent-primary: #0D9488; /* teal-600 */
+  --accent-hover: #0F766E; /* teal-700 */
+  --accent-light: #14B8A6; /* teal-500 */
+  --text-main: #F1F5F9; /* text-slate-100 */
+  --text-muted: #94A3B8; /* text-slate-400 */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Animations & Micro-Interactions */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Smooth Interactive Elements */
+button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Smooth Card Hover Glows */
+.smooth-card {
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.smooth-card:hover {
+  border-color: #0D9488 !important;
+  box-shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.15) !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0D9488;
+}

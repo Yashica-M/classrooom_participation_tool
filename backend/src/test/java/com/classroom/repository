@@ -1,0 +1,51 @@
+package com.classroom.repository;
+
+import com.classroom.model.Question;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.Rollback;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
+@Rollback
+public class QuestionRepositoryTest {
+
+    @Autowired
+    private QuestionRepository questionRepository;
+
+    private Question question;
+
+    @BeforeEach
+    public void setUp() {
+        question = new Question();
+        question.setContent("What is the confusion meter?");
+        question.setSessionId(1L);
+    }
+
+    @Test
+    public void testSaveQuestion() {
+        Question savedQuestion = questionRepository.save(question);
+        assertThat(savedQuestion.getId()).isNotNull();
+    }
+
+    @Test
+    public void testFindById() {
+        Question savedQuestion = questionRepository.save(question);
+        Optional<Question> foundQuestion = questionRepository.findById(savedQuestion.getId());
+        assertThat(foundQuestion).isPresent();
+        assertThat(foundQuestion.get().getContent()).isEqualTo("What is the confusion meter?");
+    }
+
+    @Test
+    public void testDeleteQuestion() {
+        Question savedQuestion = questionRepository.save(question);
+        questionRepository.delete(savedQuestion);
+        Optional<Question> foundQuestion = questionRepository.findById(savedQuestion.getId());
+        assertThat(foundQuestion).isNotPresent();
+    }
+}
