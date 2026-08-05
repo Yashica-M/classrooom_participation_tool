@@ -12,17 +12,29 @@ const socketHandler = require('./socket');
 const app = express();
 const server = http.createServer(app);
 
-const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
-  : '*';
+// Dynamic CORS configuration supporting Vercel, localhost, and credentials
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like server-to-server, curl, mobile apps)
+    if (!origin) return callback(null, true);
 
-// Enable CORS
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
-}));
+    // If process.env.CORS_ORIGIN is specified and not '*', check against explicit allowed origins
+    if (process.env.CORS_ORIGIN && process.env.CORS_ORIGIN !== '*') {
+      const allowedList = process.env.CORS_ORIGIN.split(',').map(o => o.trim());
+      if (allowedList.includes(origin)) {
+        return callback(null, true);
+      }
+    }
 
+    // Reflect the requesting origin to satisfy Access-Control-Allow-Origin with credentials
+    return callback(null, origin);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Connect Database
@@ -40,7 +52,10 @@ app.get('/health', (req, res) => {
 // Socket.io Setup with CORS
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      return callback(null, origin);
+    },
     methods: ['GET', 'POST'],
     credentials: true
   }
