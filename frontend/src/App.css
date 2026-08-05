@@ -136,19 +136,6 @@ button:active { transform: scale(0.97); }
   background-clip: text;
 }
 
-/* ── Divider ── */
-.divider {
-  border: none;
-  border-top: 1px solid var(--border-subtle);
-  margin: 0;
-}
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar       { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #7C3AED; }
-
 /* ── Form Inputs ── */
 input, textarea, select {
   font-family: inherit;
@@ -180,4 +167,72 @@ input::placeholder, textarea::placeholder {
   background: var(--accent-emerald);
   box-shadow: 0 0 8px var(--accent-emerald);
   animation: softPulse 2s ease-in-out infinite;
+}
+
+/* ── Mobile & Tablet Responsiveness ── */
+@media (max-width: 900px) {
+  .responsive-nav {
+    padding: 14px 20px !important;
+  }
+
+  .responsive-nav-links {
+    display: none !important;
+  }
+
+  .responsive-hero {
+    grid-template-columns: 1fr !important;
+    padding: 40px 20px 40px !important;
+    gap: 40px !important;
+  }
+
+  .responsive-hero-h1 {
+    font-size: 36px !important;
+    line-height: 1.15 !important;
+  }
+
+  .responsive-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  .responsive-section-padding {
+    padding: 48px 20px !important;
+  }
+
+  .responsive-panel-padding {
+    padding: 28px 20px !important;
+  }
+
+  .responsive-gateway-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .responsive-header-flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .responsive-dashboard-padding {
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-hero-h1 {
+    font-size: 28px !important;
+  }
+
+  .responsive-avatar-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  .responsive-emoji-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 4px !important;
+  }
+
+  .responsive-emoji-btn {
+    padding: 8px 2px !important;
+  }
 }

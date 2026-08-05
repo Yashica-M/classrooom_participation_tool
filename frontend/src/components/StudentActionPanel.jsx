@@ -46,17 +46,17 @@ const StudentActionPanel = ({
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#070B17', color: '#F1F5F9', padding: '24px 32px', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div className="responsive-dashboard-padding" style={{ minHeight: '100vh', backgroundColor: '#070B17', color: '#F1F5F9', padding: '24px 32px', fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      {/* Top bar with Logo */}
-      <header style={{
+      {/* Top bar with Responsive Header Flex */}
+      <header className="responsive-header-flex" style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         background: '#0E1525', border: '1px solid rgba(255,255,255,0.06)',
         borderRadius: '12px', padding: '14px 22px', marginBottom: '24px',
         flexWrap: 'wrap', gap: '12px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <Logo size={28} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <Logo size={26} />
           <div style={{ borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '14px' }}>
             <div style={{ fontWeight: 700, fontSize: '14px' }}>Student Workspace</div>
             <div style={{ fontSize: '12px', color: '#64748B' }}>
@@ -65,7 +65,7 @@ const StudentActionPanel = ({
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <div style={{ fontSize: '12px', color: '#64748B', background: '#141D30', border: '1px solid rgba(255,255,255,0.06)', padding: '6px 12px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Clock size={13} color="#7C3AED" /> {time}
           </div>
@@ -99,28 +99,28 @@ const StudentActionPanel = ({
       </header>
 
       {/* Main grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
 
         {/* Column 1 */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
           {/* Understanding cards */}
-          <div className="glass-card-static" style={{ padding: '22px', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="glass-card-static" style={{ padding: '20px', border: '1px solid rgba(255,255,255,0.06)' }}>
             <div style={{ marginBottom: '14px' }}>
-              <div style={{ fontWeight: 700, fontSize: '15px', color: '#F1F5F9' }}>How well are you following?</div>
+              <div style={{ fontWeight: 700, fontSize: '14px', color: '#F1F5F9' }}>How well are you following?</div>
               <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>Your response is sent to the instructor</div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
+            <div className="responsive-emoji-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
               {UNDERSTANDING_LEVELS.map((lvl) => (
-                <button key={lvl.level} type="button" onClick={() => handleLevelClick(lvl)} style={{
+                <button key={lvl.level} type="button" onClick={() => handleLevelClick(lvl)} className="responsive-emoji-btn" style={{
                   background: selectedLevel === lvl.level ? `${lvl.color}20` : '#0E1525',
                   border: selectedLevel === lvl.level ? `1px solid ${lvl.color}` : '1px solid rgba(255,255,255,0.06)',
-                  borderRadius: '10px', padding: '12px 4px', cursor: 'pointer',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px',
+                  borderRadius: '10px', padding: '10px 2px', cursor: 'pointer',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
                   transition: 'all 0.15s ease',
                   fontFamily: 'inherit'
                 }}>
-                  <span style={{ fontSize: '24px' }}>{lvl.emoji}</span>
+                  <span style={{ fontSize: '22px' }}>{lvl.emoji}</span>
                   <span style={{ fontSize: '10px', fontWeight: 600, color: selectedLevel === lvl.level ? lvl.color : '#64748B', textAlign: 'center' }}>{lvl.label}</span>
                 </button>
               ))}
@@ -128,41 +128,41 @@ const StudentActionPanel = ({
           </div>
 
           {/* Attendance Status */}
-          <div className="glass-card" style={{ padding: '22px' }}>
+          <div className="glass-card" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <div style={{ fontWeight: 700, fontSize: '15px', color: '#F1F5F9', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CheckCircle2 size={17} color="#10B981" /> Session Attendance
+              <div style={{ fontWeight: 700, fontSize: '14px', color: '#F1F5F9', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CheckCircle2 size={16} color="#10B981" /> Session Attendance
               </div>
-              <button type="button" onClick={() => setShowQr(true)} className="btn-primary" style={{ padding: '5px 13px', borderRadius: '6px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <button type="button" onClick={() => setShowQr(true)} className="btn-primary" style={{ padding: '5px 12px', borderRadius: '6px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <QrCode size={13} /> QR Code
               </button>
             </div>
             <div style={{ background: '#0E1525', borderRadius: '8px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <div style={{ width: '44px', height: '44px', borderRadius: '50%', border: '3px solid #10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 700, color: '#10B981', flexShrink: 0 }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid #10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#10B981', flexShrink: 0 }}>
                 ✓
               </div>
               <div>
-                <div style={{ fontWeight: 600, fontSize: '14px', color: '#F1F5F9' }}>Session Connected</div>
+                <div style={{ fontWeight: 600, fontSize: '13px', color: '#F1F5F9' }}>Session Connected</div>
                 <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>Active in Room {sessionCode || 'Main'}</div>
               </div>
             </div>
           </div>
 
-          {/* Resources (Dynamic or clean empty state) */}
-          <div className="glass-card" style={{ padding: '22px' }}>
-            <div style={{ fontWeight: 700, fontSize: '15px', color: '#F1F5F9', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <BookOpen size={17} color="#22D3EE" /> Session Materials
+          {/* Resources */}
+          <div className="glass-card" style={{ padding: '20px' }}>
+            <div style={{ fontWeight: 700, fontSize: '14px', color: '#F1F5F9', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <BookOpen size={16} color="#22D3EE" /> Session Materials
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {resources.length > 0 ? (
                 resources.map((r, i) => (
-                  <div key={i} style={{ background: '#0E1525', padding: '11px 14px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div key={i} style={{ background: '#0E1525', padding: '10px 14px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '13px', color: '#94A3B8' }}>{r.name}</span>
                     <span style={{ fontSize: '12px', color: '#22D3EE', fontWeight: 600, cursor: 'pointer' }}>View</span>
                   </div>
                 ))
               ) : (
-                <div style={{ fontSize: '13px', color: '#64748B', textAlign: 'center', padding: '12px 0' }}>
+                <div style={{ fontSize: '13px', color: '#64748B', textAlign: 'center', padding: '10px 0' }}>
                   No session materials uploaded yet.
                 </div>
               )}
@@ -174,18 +174,18 @@ const StudentActionPanel = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <QAFeed questions={questions} role="STUDENT" onSubmitQuestion={onSubmitQuestion} onUpvoteQuestion={onUpvoteQuestion} />
 
-          {/* Announcements (Dynamic or clean empty state) */}
-          <div className="glass-card" style={{ padding: '22px' }}>
-            <div style={{ fontWeight: 700, fontSize: '15px', color: '#F1F5F9', marginBottom: '14px' }}>Announcements</div>
+          {/* Announcements */}
+          <div className="glass-card" style={{ padding: '20px' }}>
+            <div style={{ fontWeight: 700, fontSize: '14px', color: '#F1F5F9', marginBottom: '14px' }}>Announcements</div>
             {announcements.length > 0 ? (
               announcements.map((a, i) => (
                 <div key={i} style={{ borderLeft: '2px solid #7C3AED', paddingLeft: '14px', marginBottom: '12px' }}>
-                  <div style={{ fontWeight: 600, fontSize: '14px', color: '#F1F5F9' }}>{a.title}</div>
+                  <div style={{ fontWeight: 600, fontSize: '13px', color: '#F1F5F9' }}>{a.title}</div>
                   <p style={{ fontSize: '13px', color: '#94A3B8', margin: '4px 0 0 0' }}>{a.content}</p>
                 </div>
               ))
             ) : (
-              <div style={{ fontSize: '13px', color: '#64748B', textAlign: 'center', padding: '12px 0' }}>
+              <div style={{ fontSize: '13px', color: '#64748B', textAlign: 'center', padding: '10px 0' }}>
                 No active announcements for this session.
               </div>
             )}
@@ -198,12 +198,12 @@ const StudentActionPanel = ({
 
       {/* QR modal */}
       {showQr && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(7,11,23,0.85)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="glass-card-static" style={{ maxWidth: '360px', width: '100%', padding: '32px', textAlign: 'center' }}>
-            <QrCode size={72} color="#7C3AED" style={{ margin: '0 auto 14px auto' }} />
-            <h3 style={{ fontSize: '17px', fontWeight: 800, marginBottom: '8px' }}>Room Code: {sessionCode || 'Active'}</h3>
-            <p style={{ color: '#64748B', fontSize: '13px', marginBottom: '20px' }}>Share this code with your class to join.</p>
-            <button onClick={() => setShowQr(false)} className="btn-primary" style={{ padding: '10px 24px', borderRadius: '8px', fontSize: '14px', fontWeight: 600 }}>Close</button>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(7,11,23,0.85)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+          <div className="glass-card-static" style={{ maxWidth: '340px', width: '100%', padding: '28px', textAlign: 'center' }}>
+            <QrCode size={64} color="#7C3AED" style={{ margin: '0 auto 14px auto' }} />
+            <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '8px' }}>Room Code: {sessionCode || 'Active'}</h3>
+            <p style={{ color: '#64748B', fontSize: '13px', marginBottom: '18px' }}>Share this code with your class to join.</p>
+            <button onClick={() => setShowQr(false)} className="btn-primary" style={{ padding: '10px 24px', borderRadius: '8px', fontSize: '13px', fontWeight: 600 }}>Close</button>
           </div>
         </div>
       )}
