@@ -1,63 +1,44 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
-const MUTED_CHART_COLORS = ['#14B8A6', '#3B82F6', '#0EA5E9', '#6366F1', '#38BDF8'];
+const BAR_COLORS = ['#7C3AED', '#2563EB', '#22D3EE', '#10B981', '#F59E0B'];
 
 const LivePollChart = ({ poll }) => {
-  if (!poll || !poll.options) {
+  if (!poll?.options) {
     return (
-      <div style={{
-        background: '#0F172A',
-        borderRadius: '12px',
-        padding: '24px',
-        color: '#94A3B8',
-        textAlign: 'center',
-        border: '1px solid #1E293B'
-      }}>
-        No active poll right now. Broadcast a poll to start gathering live votes!
+      <div className="glass-card-static" style={{ padding: '28px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ fontSize: '32px', marginBottom: '10px' }}>📊</div>
+        <div style={{ fontWeight: 700, color: '#F1F5F9', marginBottom: '4px' }}>No active poll</div>
+        <div style={{ fontSize: '13px', color: '#64748B' }}>Launch a poll from the builder to see live results here.</div>
       </div>
     );
   }
 
-  const chartData = poll.options.map(opt => ({
-    name: opt.text,
-    votes: opt.votes || 0
-  }));
+  const data = poll.options.map(o => ({ name: o.text, votes: o.votes || 0 }));
 
   return (
-    <div style={{
-      background: '#0F172A',
-      borderRadius: '12px',
-      padding: '24px',
-      color: '#F1F5F9',
-      border: '1px solid #1E293B'
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+    <div className="glass-card-static" style={{ padding: '22px', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
         <div>
-          <span style={{ background: '#0D9488', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>
-            LIVE POLL
-          </span>
-          <h3 style={{ margin: '8px 0 0 0', fontSize: '16px', fontWeight: 700 }}>
-            {poll.question}
-          </h3>
+          <div style={{ fontSize: '11px', color: '#7C3AED', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Live results</div>
+          <div style={{ fontWeight: 700, fontSize: '15px', color: '#F1F5F9' }}>{poll.question}</div>
         </div>
-        <span style={{ background: '#020617', border: '1px solid #1E293B', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', color: '#14B8A6', fontWeight: 600 }}>
-          {poll.totalVotes || 0} Total Votes
+        <span style={{ fontSize: '12px', color: '#64748B', background: '#0E1525', padding: '4px 10px', borderRadius: '12px', fontWeight: 600, flexShrink: 0, marginLeft: '12px' }}>
+          {poll.totalVotes || 0} votes
         </span>
       </div>
 
-      <div style={{ width: '100%', height: '220px', marginTop: '16px' }}>
+      <div style={{ width: '100%', height: '200px' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-            <XAxis dataKey="name" stroke="#94A3B8" fontSize={12} tickLine={false} />
-            <YAxis stroke="#94A3B8" fontSize={12} allowDecimals={false} />
+          <BarChart data={data} margin={{ top: 8, right: 8, left: -24, bottom: 16 }}>
+            <XAxis dataKey="name" stroke="#4B5563" fontSize={11} tickLine={false} axisLine={false} />
+            <YAxis stroke="#4B5563" fontSize={11} allowDecimals={false} />
             <Tooltip
-              contentStyle={{ background: '#020617', borderColor: '#1E293B', borderRadius: '8px', color: '#FFF' }}
+              contentStyle={{ background: '#141D30', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', color: '#F1F5F9', fontSize: '13px' }}
+              cursor={{ fill: 'rgba(124,58,237,0.06)' }}
             />
             <Bar dataKey="votes" radius={[6, 6, 0, 0]}>
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={MUTED_CHART_COLORS[index % MUTED_CHART_COLORS.length]} />
-              ))}
+              {data.map((_, i) => <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />)}
             </Bar>
           </BarChart>
         </ResponsiveContainer>

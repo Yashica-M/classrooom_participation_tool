@@ -1,124 +1,58 @@
 import React, { useState } from 'react';
-import { BarChart3, CheckCircle2, X } from 'lucide-react';
+import { CheckCircle2, X } from 'lucide-react';
 
 const PollModal = ({ poll, onSubmitVote, onClose }) => {
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [hasVoted, setHasVoted] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [voted, setVoted] = useState(false);
 
-  if (!poll || !poll.options) return null;
+  if (!poll?.options) return null;
 
-  const handleVoteSubmit = (optionId) => {
-    if (hasVoted) return;
-    setSelectedOption(optionId);
-    setHasVoted(true);
-    onSubmitVote(optionId);
+  const handleVote = (id) => {
+    if (voted) return;
+    setSelected(id);
+    setVoted(true);
+    onSubmitVote(id);
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(2, 6, 23, 0.85)',
-      backdropFilter: 'blur(4px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 9999,
-      padding: '20px'
-    }}>
-      <div style={{
-        background: '#0F172A',
-        width: '100%',
-        maxWidth: '500px',
-        padding: '28px',
-        borderRadius: '16px',
-        border: '1px solid #0D9488',
-        boxShadow: '0 20px 40px -10px rgba(0,0,0,0.7)',
-        color: '#F1F5F9',
-        position: 'relative'
-      }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(7,11,23,0.88)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
+      <div className="glass-card-static" style={{ width: '100%', maxWidth: '480px', padding: '32px', border: '1px solid rgba(124,58,237,0.3)', boxShadow: '0 20px 60px -10px rgba(124,58,237,0.25)', position: 'relative' }}>
         {onClose && (
-          <button
-            onClick={onClose}
-            style={{
-              position: 'absolute',
-              top: '16px',
-              right: '16px',
-              background: 'none',
-              border: 'none',
-              color: '#94A3B8',
-              cursor: 'pointer'
-            }}
-          >
-            <X size={20} />
+          <button type="button" onClick={onClose} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', lineHeight: 0 }}>
+            <X size={18} />
           </button>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-          <div style={{ background: '#0D9488', padding: '8px', borderRadius: '8px', display: 'flex' }}>
-            <BarChart3 size={20} color="#FFF" />
-          </div>
-          <div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#14B8A6', letterSpacing: '1px' }}>
-              LIVE CLASS POLL
-            </span>
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#F1F5F9' }}>
-              {poll.question}
-            </h3>
-          </div>
-        </div>
+        <div style={{ fontSize: '11px', color: '#7C3AED', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Poll</div>
+        <h3 style={{ fontSize: '19px', fontWeight: 700, color: '#F1F5F9', marginBottom: '22px', lineHeight: 1.4 }}>{poll.question}</h3>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', margin: '20px 0' }}>
-          {poll.options.map((opt) => (
-            <button
-              key={opt.id}
-              onClick={() => handleVoteSubmit(opt.id)}
-              disabled={hasVoted}
-              style={{
-                background: selectedOption === opt.id ? '#0D9488' : '#020617',
-                color: '#FFF',
-                border: selectedOption === opt.id ? '1px solid #14B8A6' : '1px solid #1E293B',
-                padding: '14px 18px',
-                borderRadius: '8px',
-                fontWeight: 600,
-                fontSize: '14px',
-                cursor: hasVoted ? 'default' : 'pointer',
-                textAlign: 'left',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                transition: 'all 0.15s ease'
-              }}
-            >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+          {poll.options.map(opt => (
+            <button key={opt.id} type="button" onClick={() => handleVote(opt.id)} disabled={voted} style={{
+              background: selected === opt.id ? 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(37,99,235,0.3))' : '#0E1525',
+              color: '#F1F5F9',
+              border: selected === opt.id ? '1px solid #7C3AED' : '1px solid rgba(255,255,255,0.07)',
+              padding: '14px 18px',
+              borderRadius: '8px',
+              fontWeight: selected === opt.id ? 700 : 500,
+              fontSize: '14px',
+              cursor: voted ? 'default' : 'pointer',
+              textAlign: 'left',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontFamily: 'inherit',
+              transition: 'all 0.15s ease'
+            }}>
               <span>{opt.text}</span>
-              {hasVoted && (
-                <span style={{ fontSize: '12px', color: '#94A3B8', fontWeight: 'bold' }}>
-                  {opt.votes || 0} votes
-                </span>
-              )}
+              {voted && <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>{opt.votes || 0}</span>}
             </button>
           ))}
         </div>
 
-        {hasVoted && (
-          <div style={{
-            background: 'rgba(13, 148, 136, 0.15)',
-            border: '1px solid #0D9488',
-            borderRadius: '8px',
-            padding: '10px',
-            textAlign: 'center',
-            color: '#14B8A6',
-            fontSize: '13px',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px'
-          }}>
-            <CheckCircle2 size={16} /> Vote cast! Live graph updating on main screen.
+        {voted && (
+          <div style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '8px', padding: '11px', textAlign: 'center', color: '#10B981', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <CheckCircle2 size={16} /> Response recorded — results are updating live
           </div>
         )}
       </div>

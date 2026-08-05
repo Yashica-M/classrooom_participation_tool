@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import ConfusionGauge from './confusion/ConfusionGauge';
 import LivePollChart from './polls/LivePollChart';
 import QAFeed from './QAFeed';
-import { Users, Radio, MessageSquarePlus, Send, LogOut } from 'lucide-react';
+import { Radio, Send, LogOut, QrCode, Copy, Bot, AlertTriangle, Sparkles, CheckCircle2 } from 'lucide-react';
+import Logo from './Logo';
 
 const InstructorControlPanel = ({
-  sessionCode,
-  userName,
-  participantCount,
-  isConnected,
-  confusionScore,
-  totalConfusionResponses,
+  sessionCode = '',
+  userName = 'Instructor',
+  participantCount = 0,
+  isConnected = true,
+  confusionScore = 1.0,
+  totalConfusionResponses = 0,
   activePoll,
-  questions,
+  questions = [],
   onStartPoll,
   onUpvoteQuestion,
   onMarkAnswered,
@@ -21,201 +22,175 @@ const InstructorControlPanel = ({
 }) => {
   const [pollQuestion, setPollQuestion] = useState('');
   const [pollOptionsStr, setPollOptionsStr] = useState('');
+  const [sessionActive, setSessionActive] = useState(true);
+  const [sessionTime, setSessionTime] = useState(0);
+  const [showQr, setShowQr] = useState(false);
+
+  useEffect(() => {
+    let t;
+    if (sessionActive) t = setInterval(() => setSessionTime(s => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [sessionActive]);
+
+  const fmt = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
   const handleLaunchPoll = (e) => {
     e.preventDefault();
-    if (!pollQuestion.trim()) {
-      toast.error('Please enter a poll question.');
-      return;
-    }
-
-    const options = pollOptionsStr
-      .split(',')
-      .map(s => s.trim())
-      .filter(Boolean);
-
-    if (options.length < 2) {
-      toast.error('Please enter at least 2 options separated by commas.');
-      return;
-    }
-
-    onStartPoll(pollQuestion, options);
-    toast.success('🚀 Live Poll broadcasted to all students!', { id: 'broadcast-poll' });
+    if (!pollQuestion.trim()) return toast.error('Enter a question first.');
+    const opts = pollOptionsStr.split(',').map(s => s.trim()).filter(Boolean);
+    if (opts.length < 2) return toast.error('Add at least 2 options, separated by commas.');
+    onStartPoll(pollQuestion, opts);
+    toast.success('Poll broadcasted to session!');
     setPollQuestion('');
     setPollOptionsStr('');
   };
 
-  const handleMarkAnsweredWrapped = (questionId) => {
-    onMarkAnswered(questionId);
-    toast.success('✓ Question marked as answered!', { id: 'mark-answered-toast' });
+  const copyLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/session/${sessionCode}`);
+    toast.success('Invite link copied');
   };
 
+  const statusLabel = confusionScore <= 1.8 ? 'Clear' : confusionScore <= 2.8 ? 'Mostly clear' : confusionScore <= 3.8 ? 'Some confusion' : 'Struggling';
+  const statusColor = confusionScore <= 1.8 ? '#10B981' : confusionScore <= 2.8 ? '#2563EB' : confusionScore <= 3.8 ? '#F59E0B' : '#EF4444';
+
   return (
-    <div className="animate-fade-in" style={{
-      padding: '32px',
-      backgroundColor: '#020617',
-      color: '#F1F5F9',
-      minHeight: '100vh',
-      fontFamily: 'Inter, system-ui, sans-serif'
-    }}>
-      {/* Zen SaaS Header Bar */}
+    <div style={{ minHeight: '100vh', backgroundColor: '#070B17', color: '#F1F5F9', padding: '24px 32px', fontFamily: 'Inter, system-ui, sans-serif' }}>
+
+      {/* Top bar with Logo */}
       <header style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        background: '#0F172A',
-        padding: '20px 24px',
-        borderRadius: '12px',
-        border: '1px solid #1E293B',
-        marginBottom: '28px',
-        flexWrap: 'wrap',
-        gap: '16px'
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: '#0E1525', border: '1px solid rgba(255,255,255,0.06)',
+        borderRadius: '12px', padding: '14px 22px', marginBottom: '24px',
+        flexWrap: 'wrap', gap: '12px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ background: '#0D9488', padding: '10px', borderRadius: '10px', display: 'flex' }}>
-            <Radio size={22} color="#FFF" />
-          </div>
-          <div>
-            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 800 }}>Instructor Control Panel</h2>
-            <span style={{ fontSize: '12px', color: '#94A3B8' }}>
-              Instructor: <strong style={{ color: '#F1F5F9' }}>{userName || 'Prof. Instructor'}</strong> | Session: <strong style={{ color: '#14B8A6' }}>{sessionCode}</strong>
-            </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <Logo size={28} />
+          <div style={{ borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '14px' }}>
+            <div style={{ fontWeight: 700, fontSize: '14px' }}>Instructor Control Panel</div>
+            <div style={{ fontSize: '12px', color: '#64748B' }}>
+              {userName} · Room <strong style={{ color: '#22D3EE' }}>{sessionCode || 'Active'}</strong>
+            </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#020617', padding: '6px 14px', borderRadius: '20px', border: '1px solid #1E293B' }}>
-            <Users size={16} color="#14B8A6" />
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#E2E8F0' }}>
-              {participantCount} Active Students
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* Live toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#141D30', border: '1px solid rgba(255,255,255,0.06)', padding: '6px 14px', borderRadius: '20px' }}>
+            <button type="button" onClick={() => setSessionActive(a => !a)} style={{
+              width: '34px', height: '18px', borderRadius: '9px', border: 'none',
+              background: sessionActive ? '#10B981' : '#374151', position: 'relative', cursor: 'pointer', flexShrink: 0
+            }}>
+              <span style={{ position: 'absolute', top: '2px', left: sessionActive ? '18px' : '2px', width: '14px', height: '14px', borderRadius: '50%', background: '#fff', transition: 'left 0.2s ease' }} />
+            </button>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: sessionActive ? '#10B981' : '#64748B' }}>
+              {sessionActive ? `Live · ${fmt(sessionTime)}` : 'Paused'}
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              backgroundColor: isConnected ? '#14B8A6' : '#EF4444'
-            }}></span>
-            <span style={{ fontSize: '12px', color: isConnected ? '#14B8A6' : '#EF4444', fontWeight: 700 }}>
-              {isConnected ? 'LIVE' : 'OFFLINE'}
-            </span>
-          </div>
-
-          <button
-            onClick={onLeaveSession}
-            style={{
-              background: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid #EF4444',
-              color: '#F87171',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '13px'
-            }}
-          >
-            <LogOut size={14} /> Exit Session
+          <button type="button" onClick={copyLink} className="btn-secondary" style={{ padding: '7px 14px', borderRadius: '8px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Copy size={13} /> Invite
+          </button>
+          <button type="button" onClick={() => setShowQr(true)} className="btn-secondary" style={{ padding: '7px 14px', borderRadius: '8px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <QrCode size={13} /> QR Code
+          </button>
+          <button onClick={onLeaveSession} style={{
+            background: 'transparent', border: '1px solid rgba(239,68,68,0.3)', color: '#F87171',
+            padding: '7px 14px', borderRadius: '8px', fontSize: '13px', fontWeight: 600,
+            display: 'flex', alignItems: 'center', gap: '6px', fontFamily: 'inherit', cursor: 'pointer'
+          }}>
+            <LogOut size={13} /> End Session
           </button>
         </div>
       </header>
 
-      {/* Main Spacious Grid Layout */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-        gap: '24px'
-      }}>
-        {/* Column 1: Speedometer Gauge & Launch Poll */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* KPI Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+        {[
+          { label: 'Students Online', value: `${participantCount}`, color: '#22D3EE' },
+          { label: 'Questions Pending', value: `${questions.length}`, color: '#A78BFA' },
+          { label: 'Class Comprehension', value: statusLabel, color: statusColor },
+          { label: 'Poll Votes', value: activePoll ? `${activePoll.totalVotes || 0}` : 'None', color: '#F59E0B' },
+        ].map((kpi, i) => (
+          <div key={i} className="glass-card" style={{ padding: '18px 20px' }}>
+            <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>{kpi.label}</div>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: kpi.color }}>{kpi.value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Main columns */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
+
+        {/* Left column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <ConfusionGauge score={confusionScore} totalResponses={totalConfusionResponses} />
 
-          <div className="smooth-card" style={{
-            background: '#0F172A',
-            padding: '24px',
-            borderRadius: '12px',
-            border: '1px solid #1E293B'
-          }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', color: '#F1F5F9' }}>
-              <MessageSquarePlus size={20} color="#0D9488" /> Launch Live Poll
-            </h3>
-            <form onSubmit={handleLaunchPoll}>
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '12px', color: '#94A3B8', marginBottom: '6px' }}>Poll Question</label>
-                <input
-                  type="text"
-                  value={pollQuestion}
-                  onChange={(e) => setPollQuestion(e.target.value)}
-                  placeholder="e.g. Which layer does HTTP operate on?"
-                  style={{
-                    width: '100%',
-                    background: '#020617',
-                    border: '1px solid #1E293B',
-                    color: '#F1F5F9',
-                    padding: '12px 14px',
-                    borderRadius: '6px',
-                    boxSizing: 'border-box'
-                  }}
-                />
+          {/* Poll builder */}
+          <div className="glass-card-static" style={{ padding: '22px', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontWeight: 700, fontSize: '15px', color: '#F1F5F9', marginBottom: '16px' }}>Broadcast a Poll</div>
+            <form onSubmit={handleLaunchPoll} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#64748B', marginBottom: '6px' }}>Poll Question</label>
+                <input type="text" value={pollQuestion} onChange={e => setPollQuestion(e.target.value)}
+                  placeholder="Enter your question..." style={{ width: '100%', background: '#0E1525', border: '1px solid rgba(255,255,255,0.07)', color: '#F1F5F9', padding: '11px 14px', borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
               </div>
-              <div style={{ marginBottom: '18px' }}>
-                <label style={{ display: 'block', fontSize: '12px', color: '#94A3B8', marginBottom: '6px' }}>Options (Comma-separated)</label>
-                <input
-                  type="text"
-                  value={pollOptionsStr}
-                  onChange={(e) => setPollOptionsStr(e.target.value)}
-                  placeholder="e.g. Application, Transport, Network"
-                  style={{
-                    width: '100%',
-                    background: '#020617',
-                    border: '1px solid #1E293B',
-                    color: '#F1F5F9',
-                    padding: '12px 14px',
-                    borderRadius: '6px',
-                    boxSizing: 'border-box'
-                  }}
-                />
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#64748B', marginBottom: '6px' }}>Options <span style={{ color: '#4B5563', fontWeight: 400 }}>(comma-separated)</span></label>
+                <input type="text" value={pollOptionsStr} onChange={e => setPollOptionsStr(e.target.value)}
+                  placeholder="Option 1, Option 2, Option 3" style={{ width: '100%', background: '#0E1525', border: '1px solid rgba(255,255,255,0.07)', color: '#F1F5F9', padding: '11px 14px', borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
               </div>
-              <button
-                type="submit"
-                style={{
-                  width: '100%',
-                  background: '#0D9488',
-                  color: '#FFF',
-                  border: 'none',
-                  padding: '14px',
-                  borderRadius: '8px',
-                  fontWeight: 700,
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                <Send size={16} /> Broadcast Poll
+              <button type="submit" className="btn-primary" style={{ padding: '12px', borderRadius: '8px', fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <Send size={15} /> Send to Class
               </button>
             </form>
           </div>
+
+          {/* Session Insights (Dynamic based on live session metrics) */}
+          <div className="glass-card" style={{ padding: '22px', border: '1px solid rgba(34,211,238,0.15)' }}>
+            <div style={{ fontWeight: 700, fontSize: '15px', color: '#F1F5F9', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Bot size={17} color="#22D3EE" /> Live Session Insights
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', color: '#94A3B8' }}>
+              {totalConfusionResponses > 0 ? (
+                confusionScore > 3.0 ? (
+                  <div style={{ background: '#0E1525', padding: '12px', borderRadius: '8px', display: 'flex', gap: '10px' }}>
+                    <AlertTriangle size={15} color="#F59E0B" style={{ flexShrink: 0, marginTop: '1px' }} />
+                    <span>Increased confusion detected ({confusionScore.toFixed(1)}/5). Consider pausing to explain the current topic.</span>
+                  </div>
+                ) : (
+                  <div style={{ background: '#0E1525', padding: '12px', borderRadius: '8px', display: 'flex', gap: '10px' }}>
+                    <CheckCircle2 size={15} color="#10B981" style={{ flexShrink: 0, marginTop: '1px' }} />
+                    <span>Class understanding is high ({confusionScore.toFixed(1)}/5). You can proceed to the next topic.</span>
+                  </div>
+                )
+              ) : (
+                <div style={{ background: '#0E1525', padding: '12px', borderRadius: '8px', display: 'flex', gap: '10px' }}>
+                  <Sparkles size={15} color="#7C3AED" style={{ flexShrink: 0, marginTop: '1px' }} />
+                  <span>Session active. Feedback insights will update as students submit comprehension signals and poll votes.</span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Column 2: Live Poll Chart & QAFeed */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {/* Right column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <LivePollChart poll={activePoll} />
-
-          <QAFeed
-            questions={questions}
-            role="INSTRUCTOR"
-            onUpvoteQuestion={onUpvoteQuestion}
-            onMarkAnswered={handleMarkAnsweredWrapped}
-          />
+          <QAFeed questions={questions} role="INSTRUCTOR" onUpvoteQuestion={onUpvoteQuestion} onMarkAnswered={onMarkAnswered} />
         </div>
       </div>
+
+      {/* QR modal */}
+      {showQr && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(7,11,23,0.85)', backdropFilter: 'blur(8px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="glass-card-static" style={{ maxWidth: '360px', width: '100%', padding: '32px', textAlign: 'center' }}>
+            <QrCode size={88} color="#7C3AED" style={{ margin: '0 auto 16px auto' }} />
+            <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '8px' }}>Room Code: {sessionCode || 'Active'}</h3>
+            <p style={{ color: '#64748B', fontSize: '13px', marginBottom: '20px' }}>Students can scan this to join instantly.</p>
+            <button onClick={() => setShowQr(false)} className="btn-primary" style={{ padding: '10px 24px', borderRadius: '8px', fontSize: '14px', fontWeight: 600 }}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

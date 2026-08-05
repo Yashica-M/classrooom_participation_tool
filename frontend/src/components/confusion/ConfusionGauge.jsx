@@ -1,94 +1,57 @@
 import React from 'react';
+import { Activity } from 'lucide-react';
 
 const ConfusionGauge = ({ score = 1.0, totalResponses = 0 }) => {
-  const clampedScore = Math.max(1, Math.min(5, score));
-  const percentage = (clampedScore - 1) / 4;
-  const angle = -90 + percentage * 180;
+  const clamped = Math.max(1, Math.min(5, score));
+  const pct = (clamped - 1) / 4;
+  const angle = -90 + pct * 180;
 
-  let statusText = 'Clear';
-  let gaugeColor = '#14B8A6';
+  const getLabel = (v) => {
+    if (v <= 1.8) return { text: 'Clear', color: '#10B981' };
+    if (v <= 2.8) return { text: 'Mostly clear', color: '#2563EB' };
+    if (v <= 3.8) return { text: 'Some confusion', color: '#F59E0B' };
+    return { text: 'Struggling', color: '#EF4444' };
+  };
 
-  if (clampedScore > 3.8) {
-    statusText = 'High Confusion!';
-    gaugeColor = '#EF4444';
-  } else if (clampedScore > 2.8) {
-    statusText = 'Moderate Confusion';
-    gaugeColor = '#F59E0B';
-  } else if (clampedScore > 1.8) {
-    statusText = 'Mostly Clear';
-    gaugeColor = '#3B82F6';
-  }
+  const { text, color } = getLabel(clamped);
 
   return (
-    <div style={{
-      background: '#0F172A',
-      borderRadius: '12px',
-      padding: '24px',
-      color: '#F1F5F9',
-      textAlign: 'center',
-      border: '1px solid #1E293B'
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#F1F5F9' }}>
-          ⚡ Confusion Speedometer Gauge
-        </h3>
-        <span style={{
-          background: '#020617',
-          border: '1px solid #1E293B',
-          padding: '4px 10px',
-          borderRadius: '16px',
-          fontSize: '12px',
-          color: '#14B8A6',
-          fontWeight: 600
-        }}>
-          {totalResponses} {totalResponses === 1 ? 'student' : 'students'} active
-        </span>
+    <div className="glass-card-static" style={{ padding: '22px', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+        <div style={{ fontWeight: 700, fontSize: '15px', color: '#F1F5F9', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Activity size={17} color="#7C3AED" /> Comprehension
+        </div>
+        <span style={{ fontSize: '12px', color: '#64748B' }}>{totalResponses} {totalResponses === 1 ? 'student' : 'students'}</span>
       </div>
 
-      {/* SVG Gauge */}
-      <div style={{ position: 'relative', width: '220px', height: '130px', margin: '0 auto' }}>
-        <svg width="220" height="130" viewBox="0 0 200 120">
+      {/* Gauge SVG */}
+      <div style={{ position: 'relative', width: '200px', height: '110px', margin: '0 auto' }}>
+        <svg width="200" height="110" viewBox="0 0 200 110">
           <defs>
-            <linearGradient id="gaugeGradientZen" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#14B8A6" />
-              <stop offset="40%" stopColor="#3B82F6" />
-              <stop offset="75%" stopColor="#F59E0B" />
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stopColor="#10B981" />
+              <stop offset="50%"  stopColor="#7C3AED" />
               <stop offset="100%" stopColor="#EF4444" />
             </linearGradient>
           </defs>
-
-          <path
-            d="M 20 100 A 80 80 0 0 1 180 100"
-            fill="none"
-            stroke="#1E293B"
-            strokeWidth="16"
-            strokeLinecap="round"
-          />
-
-          <path
-            d="M 20 100 A 80 80 0 0 1 180 100"
-            fill="none"
-            stroke="url(#gaugeGradientZen)"
-            strokeWidth="16"
-            strokeLinecap="round"
-          />
-
-          <circle cx="100" cy="100" r="10" fill="#F1F5F9" />
-          <circle cx="100" cy="100" r="6" fill="#0F172A" />
-
-          <g transform={`rotate(${angle}, 100, 100)`} style={{ transition: 'transform 0.5s ease-out' }}>
-            <line x1="100" y1="100" x2="100" y2="30" stroke="#F1F5F9" strokeWidth="4" strokeLinecap="round" />
+          {/* Track */}
+          <path d="M 18 96 A 82 82 0 0 1 182 96" fill="none" stroke="#0E1525" strokeWidth="14" strokeLinecap="round" />
+          {/* Active arc */}
+          <path d="M 18 96 A 82 82 0 0 1 182 96" fill="none" stroke="url(#gaugeGrad)" strokeWidth="14" strokeLinecap="round" />
+          {/* Needle */}
+          <g transform={`rotate(${angle}, 100, 96)`} style={{ transition: 'transform 0.6s cubic-bezier(0.34, 1.4, 0.64, 1)' }}>
+            <line x1="100" y1="96" x2="100" y2="28" stroke="#F1F5F9" strokeWidth="3" strokeLinecap="round" />
+            <circle cx="100" cy="96" r="6" fill="#F1F5F9" />
+            <circle cx="100" cy="96" r="3" fill="#070B17" />
           </g>
         </svg>
       </div>
 
-      <div style={{ marginTop: '12px' }}>
-        <div style={{ fontSize: '32px', fontWeight: 800, color: gaugeColor, lineHeight: 1 }}>
-          {clampedScore.toFixed(2)} <span style={{ fontSize: '14px', color: '#94A3B8', fontWeight: 400 }}>/ 5.0</span>
+      <div style={{ textAlign: 'center', marginTop: '8px' }}>
+        <div style={{ fontSize: '28px', fontWeight: 800, color }}>
+          {clamped.toFixed(1)} <span style={{ fontSize: '13px', color: '#4B5563', fontWeight: 400 }}>/ 5</span>
         </div>
-        <div style={{ fontSize: '14px', fontWeight: 600, color: '#94A3B8', marginTop: '6px' }}>
-          {statusText}
-        </div>
+        <div style={{ fontSize: '13px', color, fontWeight: 600, marginTop: '4px' }}>{text}</div>
       </div>
     </div>
   );
